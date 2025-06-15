@@ -7,9 +7,20 @@ import SolicitarRelacionForm from './SolicitarRelacionForm'
 import GestionSolicitudes from './GestionSolicitudes'
 import RelacionesActivas from './RelacionesActivas'
 
-export default function SolicitarRelacion({ user }) {
-  const [solicitudes, setSolicitudes] = useState([])
-  const [relaciones, setRelaciones] = useState([])
+interface Solicitud {
+  id: string | number
+  estado: string
+  usuario_origen: {
+    id: string
+    nombre: string
+  }
+}
+
+
+export default function SolicitarRelacion({ user }:any) {
+ const [solicitudes, setSolicitudes] = useState<Solicitud[]>([])
+
+const [relaciones, setRelaciones] = useState<any[]>([]) 
   const [loadingSolicitudes, setLoadingSolicitudes] = useState(true)
   const [loadingRelaciones, setLoadingRelaciones] = useState(true)
 
@@ -22,13 +33,26 @@ export default function SolicitarRelacion({ user }) {
       .eq('estado', 'pendiente')
 
     if (error) {
-      toast.error('Error cargando solicitudes')
-      console.error(error)
-    } else {
-      setSolicitudes(data)
-    }
-    setLoadingSolicitudes(false)
+    toast.error('Error cargando solicitudes')
+    console.error(error)
+  } 
+
+  if (data) {
+    // Aquí forzamos usuario_origen a ser objeto, no array
+    const solicitudesFormateadas = data.map((item: any) => ({
+      id: item.id,
+      estado: item.estado,
+      usuario_origen: Array.isArray(item.usuario_origen)
+        ? item.usuario_origen[0]
+        : item.usuario_origen,
+    })) as Solicitud[]
+
+    setSolicitudes(solicitudesFormateadas)
   }
+  setLoadingSolicitudes(false)
+}
+
+
 
   const fetchRelaciones = async () => {
     setLoadingRelaciones(true)
@@ -48,11 +72,15 @@ export default function SolicitarRelacion({ user }) {
       console.error(error)
     } else {
       const relacionesFiltradas = data.map(rel => {
-        const yoSoyOrigen = rel.usuario_origen.id === user.id
-        const otro =
-          rel.usuario_origen.id === user.id
+        console.log(rel)  
+
+        const yoSoyOrigen = rel.usuario_origen[0] === user.id
+        const otro:any =
+          rel.usuario_origen[0] === user.id
             ? rel.usuario_destino
             : rel.usuario_origen
+
+          console.log("info",otro.id)
             
         return {
           id: rel.id,
@@ -71,7 +99,7 @@ export default function SolicitarRelacion({ user }) {
     fetchRelaciones()
   }, [])
 
-  const actualizarEstado = async (id, nuevoEstado) => {
+  const actualizarEstado = async (id:string, nuevoEstado:string) => {
     const { error } = await supabase
       .from('relaciones')
       .update({ estado: nuevoEstado })
@@ -89,7 +117,7 @@ export default function SolicitarRelacion({ user }) {
     return true
   }
 
-  const enviarSolicitud = async (correoDestino) => {
+  const enviarSolicitud = async (correoDestino:string): Promise<boolean> => {
     const { data: usuarios, error } = await supabase
       .from('usuarios')
       .select('id')
@@ -103,9 +131,7 @@ export default function SolicitarRelacion({ user }) {
       toast.error('Usuario no encontrado')
       return false
     }
-
     const usuarioDestino = usuarios[0]
-
     const { error: insertError } = await supabase
       .from('relaciones')
       .insert({
@@ -128,8 +154,8 @@ export default function SolicitarRelacion({ user }) {
   }
 
   
-const eliminarRelacion = (id) => {
-  toast(
+const eliminarRelacion = (id:string) => {
+  toast.custom(
     (t) => (
       <div className="space-y-2">
         <p className="text-sm text-gray-800">¿Estás seguro de eliminar esta relación?</p>

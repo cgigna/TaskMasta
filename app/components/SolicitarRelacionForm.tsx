@@ -1,8 +1,24 @@
 'use client'
 
 import { useState } from 'react'
+import { useUser } from "./UserContext";
 
-export default function SolicitarRelacionForm({ user, onEnviarSolicitud }) {
+interface Usuario {
+  id: string
+  nombre: string
+  apellido: string
+  email: string
+  fecha_creacion: string | null
+}
+
+interface SolicitarRelacionFormProps {
+  user: Usuario
+  onEnviarSolicitud: (correo: string) => Promise<boolean>;
+}
+
+
+
+export default function SolicitarRelacionForm({ user, onEnviarSolicitud }: SolicitarRelacionFormProps) {
   const [correo, setCorreo] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [tipoMensaje, setTipoMensaje] = useState('') // 'error' | 'success'

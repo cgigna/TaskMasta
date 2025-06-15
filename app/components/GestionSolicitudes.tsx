@@ -3,7 +3,23 @@
 import { toast } from 'sonner'
 import { Users } from 'lucide-react'
 
-export default function GestionSolicitudes({ solicitudes, loading, onActualizarEstado }) {
+
+interface Solicitud {
+  id: string | number
+  estado: string
+  usuario_origen: {
+    id: string
+    nombre: string
+  }
+}
+
+interface GestionSolicitudesProps {
+  solicitudes: Solicitud[];
+  loading: boolean;
+  onActualizarEstado: (id: any, nuevoEstado: 'aceptada' | 'rechazada') => void;
+}
+
+export default function GestionSolicitudes({ solicitudes, loading, onActualizarEstado }: GestionSolicitudesProps) {
   return (
     <div className="w-full bg-white rounded-2xl shadow-md p-6 space-y-4 border border-gray-200">
       <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">

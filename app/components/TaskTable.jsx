@@ -2,7 +2,7 @@
 
 
 export default function TaskTable({ tasks, onAction, actionLabel ,usuariosMap,user}) {
-    console.log("🧪 user1 en TaskTable:", user.id);
+
     
   return (
     

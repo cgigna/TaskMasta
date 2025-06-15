@@ -1,15 +1,32 @@
-
 'use client'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { PostgrestSingleResponse } from '@supabase/supabase-js'
 
-const UserContext = createContext({
+interface Usuario {
+  id: string
+  nombre: string
+  apellido: string
+  email: string
+  fecha_creacion: string | null
+}
+
+interface UserContextType {
+  user: Usuario | null
+  loading: boolean
+}
+
+const UserContext = createContext<UserContextType>({
   user: null,
   loading: true,
 })
 
-export function UserProvider({ children }) {
-  const [user, setUser] = useState(null)
+interface UserProviderProps {
+  children: ReactNode
+}
+
+export function UserProvider({ children }: UserProviderProps) {
+  const [user, setUser] = useState<Usuario | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -21,14 +38,19 @@ export function UserProvider({ children }) {
       } = await supabase.auth.getSession()
 
       if (session?.user?.id) {
-        // Busca en tu tabla "usuarios"
-        const { data, error } = await supabase
+        const response: PostgrestSingleResponse<Usuario> = await supabase
           .from('usuarios')
           .select('*')
           .eq('id', session.user.id)
           .single()
 
-        if (!error) setUser(data)
+        if (!response.error) {
+          setUser(response.data ?? null)
+        } else {
+          setUser(null)
+        }
+      } else {
+        setUser(null)
       }
 
       setLoading(false)
@@ -36,7 +58,6 @@ export function UserProvider({ children }) {
 
     getUser()
 
-    // Escuchar cambios de sesión
     const { data: authListener } = supabase.auth.onAuthStateChange(() => {
       getUser()
     })

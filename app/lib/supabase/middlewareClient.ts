@@ -1,7 +1,7 @@
 // lib/supabase/middlewareClient.ts
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { type NextRequest } from 'next/server'
+import { type NextRequest ,NextResponse} from 'next/server'
 
-export const getMiddlewareSupabase = (req: NextRequest) => {
-  return createMiddlewareClient({ req })
+export const getMiddlewareSupabase = (req: NextRequest,res: NextResponse) => {
+  return createMiddlewareClient({ req,res })
 }

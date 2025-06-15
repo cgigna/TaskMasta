@@ -6,37 +6,63 @@ import { useUser } from "./UserContext";
 import { supabase } from '../lib/supabaseClient';
 import TaskSection from './TaskSection'
 
+type Usuario = {
+  id: string;
+  nombre: string;
+};
+type Tarea = {
+  id: string;
+  estado: 'pendiente' | 'en_progreso' | 'completada';
+  creador_id: string;
+  asignado_id: string;
+  // agrega aquí más campos que tenga tu tabla 'tareas' si quieres
+  // como título, descripción, fecha, etc.
+  titulo?: string;
+  descripcion?: string;
+};
+
+
+
 export default function TaskManager() {
-  const [tasks, setTasks] = useState([]);
-  const [startedTasks, setStartedTasks] = useState([]);
-  const [completedTasks, setCompletedTasks] = useState([]);
+const [tasks, setTasks] = useState<Tarea[]>([]);
+const [startedTasks, setStartedTasks] = useState<Tarea[]>([]);
+const [completedTasks, setCompletedTasks] = useState<Tarea[]>([]);
+
   const { user, loading } = useUser();
   
 
   const [usuariosMap, setUsuariosMap] = useState(null);
 
- const [usuarios, setUsuarios] = useState([]);
+const [usuarios, setUsuarios] = useState<Usuario[]>([]);
 
-    const extraerUsrTareas = async () => {
-    const { data, error } = await supabase
-      .from('relaciones')
-      .select('usuario_destino (id, nombre)')
-      .eq('usuario_origen', user.id);
 
-    if (error) {
-      console.error(error);
-      return [];
-    }
+const extraerUsrTareas = async (userId: string): Promise<Usuario[]> => {
+  const { data, error } = await supabase
+    .from('relaciones')
+    .select('usuario_destino (id, nombre)')
+    .eq('usuario_origen', userId);
 
-    // Mapear para obtener solo los usuarios destino
-    return data.map(item => item.usuario_destino);
-  };
+  if (error) {
+    console.error(error);
+    return [];
+  }
 
-  const fetchTareas = async () => {
+  if (!data) return [];
+
+  // Conversión segura: primero a unknown, luego a Usuario[]
+  return (data.map(item => item.usuario_destino) as unknown) as Usuario[];
+};
+
+
+
+
+
+
+  const fetchTareas = async (userId: string) => {
   const { data: tareas, error } = await supabase
     .from('tareas')
     .select('*')
-    .or(`creador_id.eq.${user.id},asignado_id.eq.${user.id}`);
+    .or(`creador_id.eq.${userId},asignado_id.eq.${userId}`);
 
   if (error) {
     console.error('❌ Error al obtener tareas:', error.message);
@@ -61,8 +87,8 @@ const fetchUsuarios = async (ids: string[]) => {
   return usuarios;
 };
 
-const cargarTareasYUsuarios = async () => {
-  const tareas = await fetchTareas();
+const cargarTareasYUsuarios = async (userId:string) => {
+  const tareas = await fetchTareas(userId);
 
   const idsUnicos = [
     ...new Set(tareas.flatMap(t => [t.creador_id, t.asignado_id]))
@@ -86,12 +112,12 @@ useEffect(() => {
 
   if (!user) return;
 
-   if (user) {
-    setUsuarios([{ id: user.id, nombre: 'Yo' }]);
-  }
   
-  async function cargarUsuarios() {
-      const nuevosUsuarios = await extraerUsrTareas();
+  setUsuarios([{ id: user.id, nombre: 'Yo' }]);
+
+  
+  const cargarUsuarios=async ()=> {
+      const nuevosUsuarios = await extraerUsrTareas(user.id);
 
       // se llama set usuarios con parametro prevUsuarios que es el que es genrado por el componente
       //
@@ -105,13 +131,17 @@ useEffect(() => {
         //retorna un nuevo array con lo antiguo + nuevo
         return [...prevUsuarios, ...usuariosFiltrados];
       });
+      console.log(usuarios)
     }
     // se jecuta la funcion
     cargarUsuarios();
+   
+
+
   
 
-  if (user) cargarTareasYUsuarios();
-  console.log(user)
+  if (user) cargarTareasYUsuarios(user.id);
+  
 }, [user]);
 
 
@@ -128,7 +158,7 @@ useEffect(() => {
 }
 
 
-  const startTask = async (task) => {
+  const startTask = async (task:Tarea) => {
     
     const {data,error}= await supabase
             .from('tareas')
@@ -142,7 +172,7 @@ useEffect(() => {
     setStartedTasks([...startedTasks, task]);
   };
 
-  const completeTask = async (task) => {
+  const completeTask = async (task:Tarea) => {
 
     const {data,error}= await supabase 
           .from('tareas')
@@ -161,6 +191,7 @@ useEffect(() => {
     alert("Exportar a PDF aún no implementado.");
   };
 
+  console.log(usuarios)
   return (
     
 <div className="max-w-[95%] mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg" id="task-list">
@@ -180,7 +211,7 @@ useEffect(() => {
     <TaskSection title="📌 Tareas Pendientes">
       <TaskTable
         tasks={tasks}
-        title="📌 Tareas"
+        
         onAction={startTask}
         actionLabel="▶️ Iniciar"
         usuariosMap={usuariosMap}
@@ -192,7 +223,7 @@ useEffect(() => {
     <TaskSection title="▶️ Tareas Iniciadas">
       <TaskTable
         tasks={startedTasks}
-        title="▶️ Tareas Iniciadas"
+       
         onAction={completeTask}
         actionLabel="✅ Completar"
         usuariosMap={usuariosMap}
@@ -203,7 +234,7 @@ useEffect(() => {
     <TaskSection title="✅ Tareas Completadas">
       <TaskTable
         tasks={completedTasks}
-        title="✅ Tareas Completadas"
+      
         onAction={null}
         actionLabel="completado"
         usuariosMap={usuariosMap}

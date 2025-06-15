@@ -5,6 +5,13 @@ import { supabase } from '../lib/supabaseClient'
 import LogoutButton from './LogOut'
 import LoginForm from './loginForm'
 import RegisterForm from './registerform'
+import { User } from '@supabase/supabase-js'
+
+
+
+
+
+
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
