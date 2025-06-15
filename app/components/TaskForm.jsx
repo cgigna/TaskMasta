@@ -1,45 +1,44 @@
 "use client";
 import { useState } from "react";
 import { supabase } from '../lib/supabaseClient'
+import { useUser } from "./UserContext";
 
 
-export default function TaskForm({ onAddTask, usuarios }) {
+export default function TaskForm({ creador, usuarios,onTaskAdded ,  }) {
   const hoy = new Date().toISOString().split("T")[0];
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [usrSelected, setUsrSelected] = useState("");
   const [desde, setDesde] = useState("");
   const [hasta, setHasta] = useState("");
 
+  
+  
+  
+
+  
   const handleAdd = async () => {
     if (!newTaskTitle || !usrSelected || !desde || !hasta) return;
 
-    const user = usuarios.find(u => u.id === parseInt(usrSelected));
-    
     const nuevaTarea = {
       titulo: newTaskTitle,
-      usuario_id: 1, // puedes reemplazarlo por un ID real si usas autenticación
+      creador_id: creador,
+      asignado_id: usrSelected ,// puedes reemplazarlo por un ID real si usas autenticación
       fecha_inicio: desde,
       fecha_fin: hasta,
-      estado: 'Pendiente',
+      estado: 'pendiente',
       modificado_a: new Date().toISOString(),
     }
     
+  
+   
     
-    onAddTask({
-      titulo: newTaskTitle,
-      usuario: user.nombre,
-      desde,
-      hasta
-    });
-
-    console.log(nuevaTarea);
-
     const { data, error } = await supabase.from('tareas').insert([nuevaTarea])
 
     if (error) {
       console.error('❌ Error al insertar tarea:', error.message)
     } else {
       console.log('✅ Tarea agregada:', data)
+      
       setNewTaskTitle('') // limpia el input
     }
 
@@ -49,10 +48,12 @@ export default function TaskForm({ onAddTask, usuarios }) {
     setUsrSelected("");
     setDesde("");
     setHasta("");
+    if (onTaskAdded) onTaskAdded() 
   };
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-9 gap-4 mb-6">
+      
       <div className="flex flex-col sm:col-span-4">
         <label className="text-sm font-medium text-gray-600 mb-1">Título</label>
         <input 

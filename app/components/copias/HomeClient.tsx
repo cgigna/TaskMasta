@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import LoginForm from './loginForm'
+import AuthContainer from './logRegContainter'
 import TaskManager from './TaskManager'
 
 
@@ -28,7 +28,7 @@ export default function HomeClient() {
 
   return (
     <div className="p-4">
-      {user ? <TaskManager user={user} /> : <LoginForm />}
+      {user ? <TaskManager user={user} /> : <AuthContainer />}
     </div>
   )
 }
