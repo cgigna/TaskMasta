@@ -48,7 +48,7 @@ export default function TaskForm({ creador, usuarios,onTaskAdded ,  }) {
     setUsrSelected("");
     setDesde("");
     setHasta("");
-    if (onTaskAdded) onTaskAdded() 
+    if (onTaskAdded) onTaskAdded(creador) 
   };
 
   return (

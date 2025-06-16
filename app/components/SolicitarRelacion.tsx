@@ -72,7 +72,7 @@ const [relaciones, setRelaciones] = useState<any[]>([])
       console.error(error)
     } else {
       const relacionesFiltradas = data.map(rel => {
-        console.log(rel)  
+        
 
         const yoSoyOrigen = rel.usuario_origen[0] === user.id
         const otro:any =
@@ -80,7 +80,7 @@ const [relaciones, setRelaciones] = useState<any[]>([])
             ? rel.usuario_destino
             : rel.usuario_origen
 
-          console.log("info",otro.id)
+          
             
         return {
           id: rel.id,

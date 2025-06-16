@@ -15,11 +15,11 @@ type Tarea = {
   estado: 'pendiente' | 'en_progreso' | 'completada';
   creador_id: string;
   asignado_id: string;
-  // agrega aquí más campos que tenga tu tabla 'tareas' si quieres
-  // como título, descripción, fecha, etc.
-  titulo?: string;
-  descripcion?: string;
-};
+  fecha_inicio: Date,
+  fecha_fin: Date}
+  
+
+
 
 
 
@@ -131,7 +131,7 @@ useEffect(() => {
         //retorna un nuevo array con lo antiguo + nuevo
         return [...prevUsuarios, ...usuariosFiltrados];
       });
-      console.log(usuarios)
+      
     }
     // se jecuta la funcion
     cargarUsuarios();
@@ -168,6 +168,7 @@ useEffect(() => {
       console.log('ERROR AL MODIFICAR LA TAREA',error.message);
       return;
     }
+    
     setTasks(tasks.filter(t => t !== task));
     setStartedTasks([...startedTasks, task]);
   };
@@ -191,7 +192,7 @@ useEffect(() => {
     alert("Exportar a PDF aún no implementado.");
   };
 
-  console.log(usuarios)
+  
   return (
     
 <div className="max-w-[95%] mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg" id="task-list">
