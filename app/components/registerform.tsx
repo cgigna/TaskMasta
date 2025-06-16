@@ -11,15 +11,16 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSignUp = async () => {
-    if (!nombre || !apellido || !email || !password) {
-      toast.error('Por favor completa todos los campos.')
-      return
-    }
+const handleSignUp = async () => {
+  if (!nombre || !apellido || !email || !password) {
+    toast.error('Por favor completa todos los campos.')
+    return
+  }
 
-    setLoading(true)
+  setLoading(true)
 
-    const { error } = await supabase.auth.signUp({
+  try {
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -27,20 +28,36 @@ export default function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
       },
     })
 
-    setLoading(false)
+    console.log('📦 Supabase signUp response:', { data, error })
 
     if (error) {
       toast.error(error.message)
-    } else {
-      toast.success('Registro exitoso, revisa tu correo.')
-      // Opcional: limpiar campos o cambiar a login
-      onSwitch()
-      setNombre('')
-      setApellido('')
-      setEmail('')
-      setPassword('')
+      return
     }
+
+    const identities = data.user?.identities ?? []
+
+    if (identities.length === 0) {
+      // Usuario ya registrado y confirmado
+      toast.error('Este correo ya está registrado y confirmado. Intenta iniciar sesión.')
+      return
+    }
+
+    toast.success('Registro exitoso, revisa tu correo para confirmar tu cuenta.')
+
+    onSwitch()
+    setNombre('')
+    setApellido('')
+    setEmail('')
+    setPassword('')
+  } catch (err: any) {
+    console.error('🔥 Error inesperado:', err)
+    toast.error('Error inesperado: ' + (err.message ?? 'Sin mensaje'))
+  } finally {
+    setLoading(false)
   }
+}
+
 
   return (
     <div>
