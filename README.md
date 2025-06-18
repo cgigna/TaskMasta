@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskMasta 🧠✅
 
-## Getting Started
+**TaskMasta** es una aplicación web de gestión de tareas colaborativa. Está diseñada para que los usuarios puedan crear, asignar y administrar tareas con otros usuarios registrados en la plataforma. Cada tarea debe ser aceptada por el usuario receptor antes de activarse, promoviendo una comunicación clara y controlada.
 
-First, run the development server:
+## 🔧 Tecnologías utilizadas
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- [Next.js 14](https://nextjs.org/)
+- [Supabase](https://supabase.com/) (Auth y Database)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Lucide React](https://lucide.dev/) (iconos)
+- PostgreSQL (vía Supabase)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Funcionalidades
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Registro y autenticación de usuarios con correo electrónico
+- Envío de solicitudes de relación entre usuarios
+- Asignación de tareas a otros usuarios conectados
+- Sistema de aceptación/rechazo de tareas asignadas
+- Interfaz moderna (diseñada con Tailwind CSS)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🌐 Demo
 
-## Learn More
+🔗 [https://task-masta.vercel.app](https://task-masta.vercel.app)
 
-To learn more about Next.js, take a look at the following resources:
+## 📌 Estado del proyecto
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+El proyecto está en desarrollo activo. Algunas partes de la interfaz aún no son completamente responsivas, y se siguen incorporando nuevas funcionalidades de forma progresiva.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛑 Nota
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este proyecto no está pensado para ser clonado o ejecutado localmente. Es un desarrollo personal con fines de aprendizaje y portafolio. Si tienes sugerencias o deseas dejar feedback, ¡los issues están abiertos!
